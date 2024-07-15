@@ -12,6 +12,7 @@ import com.example.speedy.data.ToDoRepository
 import com.example.speedy.model.Data
 import com.example.speedy.model.breed.Breeds
 import com.example.speedy.retrofit.FactsService
+import com.example.speedy.utilities.InternetConnectivity
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,9 +62,8 @@ class NoteViewModel(val toDoRepository: ToDoRepository): ViewModel(), LifecycleE
         FactsService.getFactApi()
     }
 
-    private val _drawerNavigationState = MutableStateFlow<DrawerNavigationStates>(DrawerNavigationStates.HOME)
+    private val _drawerNavigationState = MutableStateFlow<DrawerNavigationStates>(DrawerNavigationStates.ANIFY)
     val drawerNavigationStates : StateFlow<DrawerNavigationStates> get() = _drawerNavigationState.asStateFlow()
-
 
     var page = 1
 
@@ -90,7 +90,7 @@ class NoteViewModel(val toDoRepository: ToDoRepository): ViewModel(), LifecycleE
     }
 
     init {
-       fetchData()
+       //fetchData()
     }
 
     fun updateDrawerNavigationState(state : DrawerNavigationStates) {

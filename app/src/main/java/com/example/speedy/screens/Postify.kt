@@ -41,12 +41,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.speedy.utilities.InternetConnectivity
 import com.example.speedy.view_model.PostUiState
 import com.example.speedy.view_model.PostifyViewModel
 
@@ -58,6 +60,8 @@ fun postify(postifyViewModel: PostifyViewModel,
             modifier: Modifier = Modifier) {
 
     val posts = postifyViewModel.posts.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = Unit) {
         postifyViewModel.getPosts()
@@ -148,7 +152,7 @@ fun postify(postifyViewModel: PostifyViewModel,
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center) {
                         TextField(value = userId, onValueChange = {
-                            userId = it
+                            userId = if (it.isNullOrEmpty()) "0" else it
                         }, modifier = modifier
                             .fillMaxWidth(.8f)
                             .weight(.8f),
@@ -178,7 +182,7 @@ fun postify(postifyViewModel: PostifyViewModel,
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center) {
                             TextField(value = userId, onValueChange = {
-                                userId = it
+                                userId = if (it.isNullOrEmpty()) "0" else it
                             }, modifier = modifier
                                 .fillMaxWidth(.8f)
                                 .weight(.8f),

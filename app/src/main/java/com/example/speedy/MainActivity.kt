@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.speedy.data.InMemoryToDoRepositoryImpl
 import com.example.speedy.data.PostifyRepositoryImpl
 import com.example.speedy.database.LocalPairedDB
+import com.example.speedy.database.room_post.PostDatabase
 import com.example.speedy.navigation.Navigation
 import com.example.speedy.retrofit.PostifyService
 import com.example.speedy.ui.theme.SpeedyTheme
@@ -28,7 +29,8 @@ class MainActivity : ComponentActivity() {
         noteViewModel = ViewModelProvider(this, noteViewModelFactory)[NoteViewModel::class.java]
 
         val postifyApi = PostifyService.getPostifyApiService()
-        val postifyRepository = PostifyRepositoryImpl(postifyApi)
+        val postDatabase = PostDatabase.getPostDatabase(applicationContext)
+        val postifyRepository = PostifyRepositoryImpl(applicationContext, postifyApi, postDatabase.postDao())
         val postifyViewModelFactory = PostifyViewModelFactory(postifyRepository)
         postifyViewModel = ViewModelProvider(this, postifyViewModelFactory)[PostifyViewModel::class.java]
 

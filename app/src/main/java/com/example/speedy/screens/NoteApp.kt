@@ -48,10 +48,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.speedy.utilities.InternetConnectivity
 import com.example.speedy.view_model.DrawerNavigationStates
 import com.example.speedy.view_model.FactUiState
 import com.example.speedy.view_model.NoteViewModel
@@ -62,11 +64,13 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun NoteApp(navController: NavController, noteViewModel: NoteViewModel,
-            postifyViewModel: PostifyViewModel){
+            postifyViewModel: PostifyViewModel) {
 
     val number = remember {
         mutableIntStateOf(0)
     }
+
+    val context = LocalContext.current
 
     val noteList = noteViewModel.list.observeAsState().value ?: mutableListOf<String>()
 
@@ -206,7 +210,9 @@ fun NoteApp(navController: NavController, noteViewModel: NoteViewModel,
                                         .wrapContentHeight(),
                                     contentAlignment = Alignment.Center
                                 ){
-                                    IconButton(onClick = { noteViewModel.fetchData() }) {
+                                    IconButton(onClick = {
+                                        noteViewModel.fetchData()
+                                    }) {
                                         Icon(imageVector = Icons.Filled.Refresh, contentDescription = "Refresh")
                                     }
                                 }

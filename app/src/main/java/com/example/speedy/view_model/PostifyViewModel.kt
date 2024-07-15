@@ -52,8 +52,9 @@ class PostifyViewModel(private val postifyRepository: PostifyRepository) : ViewM
                 userId = Random.nextInt(1000),
                 id = Random.nextInt(1000)
             ))?.let {
-                Log.d("TAG", "addPost: ${it.userId} and ${it.id} has been" +
-                        "added")
+                postifyRepository.getOperation()?.let {
+                    _posts.emit(PostUiState.Success(it))
+                }
             }
         }
     }
@@ -62,9 +63,15 @@ class PostifyViewModel(private val postifyRepository: PostifyRepository) : ViewM
         viewModelScope.launch {
             try {
                 _posts.emit(PostUiState.Loading)
-                postifyRepository.filterOperation(userId = userId.toInt())?.let {
-                    Log.d("TAG", "filterPosts: ${it.size}")
-                    _posts.emit(PostUiState.Success(it))
+                if (userId != "0") {
+                    postifyRepository.filterOperation(userId = userId.toInt())?.let {
+                        Log.d("TAG", "filterPosts: ${it.size}")
+                        _posts.emit(PostUiState.Success(it))
+                    }
+                }else {
+                    postifyRepository.getOperation()?.let {
+                        _posts.emit(PostUiState.Success(it))
+                    }
                 }
             }catch (e : Exception) {
                 _posts.emit(PostUiState.Error("Exception Found!!!"))
@@ -75,8 +82,8 @@ class PostifyViewModel(private val postifyRepository: PostifyRepository) : ViewM
     fun deletePost(id : Int) {
         viewModelScope.launch {
             try{
-                postifyRepository.deleteOperation(id)?.let {
-                    Log.d("TAG", "deletePost: ${it.id}")
+                postifyRepository.deleteOperation(id).let {
+                    Log.d("TAG", "deletePost: ${it}")
                 }
             }catch (e : Exception) {
                 Log.d("TAG", "deletePost: Exception Found!!!")
