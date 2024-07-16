@@ -22,14 +22,18 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.speedy.database.LocalPairedDB
+import com.example.speedy.model.Note
 import com.example.speedy.navigation.ROUTE
 import com.example.speedy.view_model.NoteViewModel
 
@@ -37,10 +41,14 @@ import com.example.speedy.view_model.NoteViewModel
 @Composable
 fun AddUpdateNote(navController: NavController, titleName: String,
                   noteViewModel: NoteViewModel) {
-    val description = rememberSaveable {
-        mutableStateOf(noteViewModel.selectedNote ?: "")
+
+    val note = remember {
+        mutableStateOf(noteViewModel.selectedNote ?: Note(title = "", description = ""))
     }
-    val dataStore = LocalPairedDB
+
+    var title by remember {
+        mutableStateOf("")
+    }
 
     BackHandler() {
         Log.d("AddUpdateNote", "AddUpdateNote: ")
@@ -48,9 +56,9 @@ fun AddUpdateNote(navController: NavController, titleName: String,
 //
 //        }
         if (titleName != "Create") {
-            noteViewModel.update(noteViewModel.selectedNote!!, description.value)
+            noteViewModel.update(note.value)
         }else {
-            noteViewModel.add(description.value)
+            noteViewModel.add(note.value)
         }
         navController.popBackStack()
     }
@@ -65,8 +73,9 @@ fun AddUpdateNote(navController: NavController, titleName: String,
         },
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            TextField(value = description.value, onValueChange =  {
-                description.value = it
+            TextField(value = title, onValueChange =  {
+                title = it
+                note.value.title = title
             }, modifier = Modifier
                 .fillMaxSize(),
                 shape = TextFieldDefaults.shape,

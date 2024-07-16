@@ -6,10 +6,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.speedy.model.Note
 
-interface ToDoRepository : DefaultLifecycleObserver {
-    fun addToDo(todo : String)
-    fun removeToDo(todo : String)
-    fun updateToDo(oldTodo: String, todo: String)
-    fun getAllToDo() : MutableList<String>
+interface ToDoRepository {
+    suspend fun addToDo(todo : Note)
+    suspend fun removeToDo(todo : Note)
+    suspend fun updateToDo(todo: Note)
+    suspend fun getAllToDo() : List<Note>
 }

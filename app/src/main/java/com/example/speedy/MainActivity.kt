@@ -24,12 +24,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val dataStore = LocalPairedDB
-        val toDoRepository = InMemoryToDoRepositoryImpl(dataStore)
+        val postDatabase = PostDatabase.getPostDatabase(applicationContext)
+        val toDoRepository = InMemoryToDoRepositoryImpl(postDatabase.noteDao())
         val noteViewModelFactory = NoteViewModelFactory(toDoRepository)
         noteViewModel = ViewModelProvider(this, noteViewModelFactory)[NoteViewModel::class.java]
 
         val postifyApi = PostifyService.getPostifyApiService()
-        val postDatabase = PostDatabase.getPostDatabase(applicationContext)
         val postifyRepository = PostifyRepositoryImpl(applicationContext, postifyApi, postDatabase.postDao())
         val postifyViewModelFactory = PostifyViewModelFactory(postifyRepository)
         postifyViewModel = ViewModelProvider(this, postifyViewModelFactory)[PostifyViewModel::class.java]

@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.speedy.data.ToDoRepository
 import com.example.speedy.model.Data
+import com.example.speedy.model.Note
 import com.example.speedy.model.breed.Breeds
 import com.example.speedy.retrofit.FactsService
 import com.example.speedy.utilities.InternetConnectivity
@@ -23,7 +24,6 @@ import kotlinx.coroutines.launch
 //livedata, flow, stateflow, shared flow, room db, mvvm, coroutine, thread,
 // looper, message queue
 
-// dele
 
 sealed class FactUiState {
     data object Loading : FactUiState()
@@ -38,18 +38,16 @@ sealed class BreedUiState {
     data class Error(val error : String) : BreedUiState()
 }
 
-
 enum class DrawerNavigationStates {
     HOME, DOGGIFY, ANIFY
 }
 
-
 class NoteViewModel(val toDoRepository: ToDoRepository): ViewModel(), LifecycleEventObserver {
 
-    private var _list = MutableLiveData<MutableList<String>>()
-    val list : LiveData<MutableList<String>> get() = _list
+    private var _list = MutableLiveData<List<Note>>()
+    val list : LiveData<List<Note>> get() = _list
 
-    var selectedNote : String? = null
+    var selectedNote : Note? = null
 
     private val _fact = MutableStateFlow<FactUiState>(FactUiState.Loading)
     val fact : StateFlow<FactUiState> get() = _fact.asStateFlow()
@@ -67,30 +65,37 @@ class NoteViewModel(val toDoRepository: ToDoRepository): ViewModel(), LifecycleE
 
     var page = 1
 
-    fun add(item: String) {
-        toDoRepository.addToDo(item)
+    fun add(item: Note) {
+        viewModelScope.launch {
+            toDoRepository.addToDo(item)
+         //   _list.postValue(toDoRepository.getAllToDo())
+        }
+
        // _list.value =  toDoRepository.getAllToDo().value
     }
 
-    fun update(oldItem : String, newItem : String) {
-        toDoRepository.updateToDo(oldItem.trim(), newItem.trim())
+    fun update(note: Note) {
+        viewModelScope.launch {
+            toDoRepository.updateToDo(note)
+          //  _list.postValue(toDoRepository.getAllToDo())
+        }
     }
 
-    fun remove(item : String) {
-        toDoRepository.removeToDo(item)
-        _list.postValue(toDoRepository.getAllToDo())
-        Log.d("TAG", "remove: $item")
+    fun remove(item : Note) {
+        viewModelScope.launch {
+            toDoRepository.removeToDo(item)
+            _list.postValue(toDoRepository.getAllToDo())
+            Log.d("TAG", "remove: $item")
+        }
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         Log.d("TAG", "onStateChanged: ${event.name}")
         if (event == Lifecycle.Event.ON_RESUME) {
-            _list.postValue(toDoRepository.getAllToDo())
+            viewModelScope.launch {
+                _list.postValue(toDoRepository.getAllToDo())
+            }
         }
-    }
-
-    init {
-       //fetchData()
     }
 
     fun updateDrawerNavigationState(state : DrawerNavigationStates) {

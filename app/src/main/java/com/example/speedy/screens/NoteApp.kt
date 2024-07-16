@@ -53,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.speedy.model.Note
 import com.example.speedy.utilities.InternetConnectivity
 import com.example.speedy.view_model.DrawerNavigationStates
 import com.example.speedy.view_model.FactUiState
@@ -72,11 +73,12 @@ fun NoteApp(navController: NavController, noteViewModel: NoteViewModel,
 
     val context = LocalContext.current
 
-    val noteList = noteViewModel.list.observeAsState().value ?: mutableListOf<String>()
+    val noteList = noteViewModel.list.observeAsState().value ?: mutableListOf<Note>()
 
     LaunchedEffect(key1 = true) {
         number.intValue += 1
         Log.d("TAG", "NoteApp: ${number.intValue}")
+        //noteViewModel.fetchData()
     }
 
     val fact = noteViewModel.fact.collectAsState()
@@ -223,7 +225,7 @@ fun NoteApp(navController: NavController, noteViewModel: NoteViewModel,
                             .background(color = Color.Green),
                             verticalArrangement = Arrangement.Top) {
                             items(noteList) {
-                                Text(it, color = Color.White,
+                                Text(it.title, color = Color.White,
                                     modifier = Modifier
                                         .pointerInput(Unit) {
                                             detectTapGestures(
