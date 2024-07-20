@@ -24,14 +24,6 @@ import kotlinx.coroutines.launch
 //livedata, flow, stateflow, shared flow, room db, mvvm, coroutine, thread,
 // looper, message queue
 
-
-sealed class FactUiState {
-    data object Loading : FactUiState()
-    data class Success(val data : Data?) : FactUiState()
-    data class Error(val error : String) : FactUiState()
-}
-
-
 sealed class BreedUiState {
     data object Loading : BreedUiState()
     data class Success(val data : Breeds?) : BreedUiState()
@@ -49,10 +41,6 @@ class NoteViewModel(val toDoRepository: ToDoRepository): ViewModel(), LifecycleE
 
     var selectedNote : Note? = null
 
-    private val _fact = MutableStateFlow<FactUiState>(FactUiState.Loading)
-    val fact : StateFlow<FactUiState> get() = _fact.asStateFlow()
-
-
     private val _breeds = MutableStateFlow<BreedUiState>(BreedUiState.Loading)
     val breeds : StateFlow<BreedUiState> get() = _breeds.asStateFlow()
 
@@ -67,17 +55,23 @@ class NoteViewModel(val toDoRepository: ToDoRepository): ViewModel(), LifecycleE
 
     fun add(item: Note) {
         viewModelScope.launch {
-            toDoRepository.addToDo(item)
-         //   _list.postValue(toDoRepository.getAllToDo())
+            if (item.title.isNotEmpty() && item.description.isNotEmpty()) {
+                toDoRepository.addToDo(item)
+                _list.postValue(toDoRepository.getAllToDo())
+            }else {
+                Log.d("TAG", "SnackBar will be shown")
+            }
         }
-
-       // _list.value =  toDoRepository.getAllToDo().value
     }
 
-    fun update(note: Note) {
+    fun update(item: Note) {
         viewModelScope.launch {
-            toDoRepository.updateToDo(note)
-          //  _list.postValue(toDoRepository.getAllToDo())
+            if (item.title.isNotEmpty() && item.description.isNotEmpty()) {
+                toDoRepository.updateToDo(item)
+                _list.postValue(toDoRepository.getAllToDo())
+            }else {
+                Log.d("TAG", "SnackBar will be shown")
+            }
         }
     }
 
@@ -91,11 +85,11 @@ class NoteViewModel(val toDoRepository: ToDoRepository): ViewModel(), LifecycleE
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         Log.d("TAG", "onStateChanged: ${event.name}")
-        if (event == Lifecycle.Event.ON_RESUME) {
-            viewModelScope.launch {
-                _list.postValue(toDoRepository.getAllToDo())
-            }
-        }
+//        if (event == Lifecycle.Event.ON_RESUME) {
+//            viewModelScope.launch {
+//                _list.postValue(toDoRepository.getAllToDo())
+//            }
+//        }
     }
 
     fun updateDrawerNavigationState(state : DrawerNavigationStates) {
@@ -107,17 +101,9 @@ class NoteViewModel(val toDoRepository: ToDoRepository): ViewModel(), LifecycleE
     fun fetchData() {
         viewModelScope.launch {
             try {
-                _fact.emit(FactUiState.Loading)
-                delay(3000)
-                val data = async {
-                    factsApis.getFacts()
-                }
-                val result = data.await().body()
-                _fact.emit(FactUiState.Success(result).also {
-                    Log.d("TAG", "fetchData: ${it.data?.data?.get(0)?.attributes?.body ?: "No Data"}")
-                })
+                _list.postValue(toDoRepository.getAllToDo())
             }catch (e : Exception) {
-                _fact.emit(FactUiState.Error("Exception Found!!!"))
+
             }
         }
     }
